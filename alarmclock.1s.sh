@@ -5,7 +5,7 @@
 # <bitbar.author>Carlson Orozco</bitbar.author>
 # <bitbar.author.github>carlsonorozco</bitbar.author.github>
 # <bitbar.desc>Alarm Clock is a plugin for BitBar that allows you to set alarm.</bitbar.desc>
-# <bitbar.image>http://www.hosted-somewhere/pluginimage</bitbar.image>
+# <bitbar.image>https://raw.githubusercontent.com/carlsonorozco/alarmclock/master/image.png</bitbar.image>
 # <bitbar.abouturl>https://github.com/carlsonorozco/alarmclock</bitbar.abouturl>
 
 # Set Alarm
