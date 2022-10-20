@@ -1,16 +1,17 @@
 #!/bin/bash
 #
-# <bitbar.title>Alarm Clock</bitbar.title>
-# <bitbar.version>v1.0</bitbar.version>
-# <bitbar.author>Carlson Orozco</bitbar.author>
-# <bitbar.author.github>carlsonorozco</bitbar.author.github>
-# <bitbar.desc>Alarm Clock is a plugin for BitBar that allows you to set alarm.</bitbar.desc>
-# <bitbar.image>https://raw.githubusercontent.com/carlsonorozco/alarmclock/master/image.png</bitbar.image>
-# <bitbar.abouturl>https://github.com/carlsonorozco/alarmclock</bitbar.abouturl>
+# <xbar.title>Alarm Clock</xbar.title>
+# <xbar.version>v1.0</xbar.version>
+# <xbar.author>Carlson Orozco</xbar.author>
+# <xbar.author.github>carlsonorozco</xbar.author.github>
+# <xbar.desc>Alarm Clock is a plugin for BitBar that notifies/make a sound at a specific time.</xbar.desc>
+# <xbar.image>https://raw.githubusercontent.com/carlsonorozco/alarmclock/master/image.png</xbar.image>
+# <xbar.abouturl>https://github.com/carlsonorozco/alarmclock</xbar.abouturl>
 
 # Set Alarm
 if [ "$1" = 'set' ]; then
-    alarm="$(osascript -e 'Tell application "System Events" to display dialog "Enter Alarm in 24 Hour Time format:" default answer ""' -e 'text returned of result' 2>/dev/null)"
+    alarm="$(osascript -e 'Tell application "System Events" to display dialog "Enter Alarm in 24 Hour Time format (HH:MM)" default answer ""' -e 'text returned of result' 2>/dev/null)"
+    # shellcheck disable=SC2181
     if [ $? -ne 0 ]; then
         # Cancelled
         exit
@@ -18,8 +19,11 @@ if [ "$1" = 'set' ]; then
         osascript -e 'Tell application "System Events" to display alert "Alarm not set" as warning'
         exit
     elif [[ ! $alarm =~ ^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$ ]]; then
-        osascript -e 'Tell application "System Events" to display alert "Alarm not set. Invalid time format" as warning'
+        osascript -e 'Tell application "System Events" to display alert "Alarm not set. Invalid time format - must be between 0:00-23:59" as warning'
         exit
+    fi
+    if [ $(/bin/echo -n "$alarm" | wc -c) -eq 4 ]; then
+        alarm="0$alarm"
     fi
 
     echo "$alarm" >> /tmp/alarmclock.data
@@ -66,7 +70,7 @@ fi
 
 # Parse alarms
 while IFS= read -r line; do
-    echo "$line | color=red bash=$0 param1=remove param2=$line terminal=false"
+    echo "$line | color=red bash='$0' param1=remove param2=$line terminal=false"
     now=$(date +%R)
     if [ "$line" == "$now" ] && [ "$(date +%S)" -le '03' ] && [ ! -f '/tmp/alarmclock_trigger.data' ]; then
         echo "$now" > '/tmp/alarmclock_trigger.data'
@@ -75,11 +79,11 @@ done </tmp/alarmclock.data
 
 # Set new alarm
 echo '---'
-echo "Set Alarm | color=green bash=$0 param1=set terminal=false"
+echo "Set Alarm | color=green bash='$0' param1=set terminal=false"
 
 # Trigger alarm
 if [ -f '/tmp/alarmclock_trigger.data' ]; then
-    echo "Stop Alarm | color=red bash=$0 param1=stop terminal=false"
+    echo "Stop Alarm | color=red bash='$0' param1=stop terminal=false"
     afplay /System/Library/Sounds/Tink.aiff
     afplay /System/Library/Sounds/Tink.aiff
     afplay /System/Library/Sounds/Tink.aiff
